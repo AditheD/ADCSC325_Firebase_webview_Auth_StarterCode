@@ -6,6 +6,7 @@ import com.google.firebase.FirebaseApp;
 import com.google.firebase.FirebaseOptions;
 import com.google.firebase.cloud.FirestoreClient;
 import java.io.IOException;
+import java.io.InputStream;
 
 /**
  *
@@ -13,7 +14,7 @@ import java.io.IOException;
  */
 public class FirestoreContext {
 
-    public Firestore firebase() {
+    /**public Firestore firebase() {
         try {
             FirebaseOptions options = new FirebaseOptions.Builder()
                     .setCredentials(GoogleCredentials.fromStream(getClass().getResourceAsStream("/files/key.json")))
@@ -24,7 +25,31 @@ public class FirestoreContext {
             ex.printStackTrace();
         }
         return FirestoreClient.getFirestore();
+    }*/
+
+        public Firestore firebase() {
+            try {
+                InputStream serviceAccount = getClass().getResourceAsStream("/files/key.json");
+                System.out.println("Stream: " + serviceAccount);
+
+                if (serviceAccount == null) {
+                    throw new IOException("Could not find '/files/key.json' in resources.");
+                }
+
+                FirebaseOptions options = new FirebaseOptions.Builder()
+                        .setCredentials(GoogleCredentials.fromStream(serviceAccount))
+                        .build();
+
+                FirebaseApp.initializeApp(options);
+                System.out.println("Firebase is initialized");
+
+            } catch (IOException ex) {
+                ex.printStackTrace();
+            }
+
+            return FirestoreClient.getFirestore();
+        }
     }
 
 
-}
+
